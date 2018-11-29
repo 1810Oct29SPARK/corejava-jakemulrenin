@@ -2,7 +2,9 @@ package com.revature.eval.java.core;
 
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -367,7 +369,7 @@ public class EvaluationService {
 	 * @param string
 	 * @return
 	 */
-	public String toPigLatin(String string) {
+	public String toPigLatin(String string) {//still need to solve phrase
 		String placeholder = "";
 		switch(string.charAt(0)) {
 		case 'a':
@@ -377,6 +379,26 @@ public class EvaluationService {
 		case 'u':
 			placeholder += string;
 			placeholder += "ay";
+		default:
+			if(placeholder == "") {
+				String stringBegin = "";
+				for(int i = 0; i < string.length(); i++) {
+					switch(string.charAt(i)) {
+					case 'a':
+					case 'e':
+					case 'i':
+					case 'o':
+					case 'u':
+						for(int j = i; j<string.length(); j++) {
+							placeholder += Character.toString(string.charAt(j));
+						}
+						placeholder += stringBegin + "ay";
+						return placeholder;
+					default:
+						stringBegin += Character.toString(string.charAt(i));
+					}
+				}
+			}
 		}
 		return placeholder;
 	}
@@ -478,7 +500,7 @@ public class EvaluationService {
 		}
 
 		public String rotate(String string) {
-			// TODO Write an implementation for this method declaration
+			
 			return null;
 		}
 
@@ -499,6 +521,11 @@ public class EvaluationService {
 	public int calculateNthPrime(int i) {
 		int count = 1;
 		int placeholder = 2;
+		if(i == 0) {
+			throw new IllegalArgumentException();
+		}else if(i==1) {
+			return placeholder;
+		}
 			for(int j = 3; j < 2147483647; j++) {
 				int otherPlaceholder = 0;
 				for(int k = 2; k < j; k++) {
@@ -550,10 +577,22 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			String alpha = "0123456789abcdefghijklmnopqrstuvwxyz";
+			String reverse = "0123456789zyxwvutsrqponmlkjihgfedcba";
+			String placeholder = "";
+			string = string.replaceAll("[^a-zA-Z0-9]", "");
+			string = string.toLowerCase();
+			for(int i = 0; i < string.length(); i++) {
+				char character = string.charAt(i);
+				int index = alpha.indexOf(character);
+				placeholder += Character.toString(reverse.charAt(index));
+				if((i+1) % 5 == 0 && i < string.length()-1) {
+					placeholder += " ";
+				}
+			}
+			return placeholder;
 		}
-
+	
 		/**
 		 * Question 14
 		 * 
@@ -565,6 +604,7 @@ public class EvaluationService {
 			return null;
 		}
 	}
+	
 
 	/**
 	 * 15. The ISBN-10 verification process is used to validate book identification
@@ -589,8 +629,26 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		String noHyphens = string.replaceAll("-", "");
+		int sum = 0;
+		int multiplier = 10;
+		for(int i = 0; i < noHyphens.length(); i++) {
+			int currentNum = 0;
+			if(noHyphens.charAt(i) == 'X') {
+				currentNum = 10;
+			}else if(Character.isDigit(noHyphens.charAt(i)) == false){
+				return false;
+			}else {
+			currentNum = Character.getNumericValue(noHyphens.charAt(i));
+			}
+			sum += currentNum * multiplier;
+			multiplier--;
+		}
+		if(sum % 11 == 0) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 
 	/**
@@ -607,8 +665,23 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isPangram(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		List<Character> alphabet = new ArrayList<Character>(Arrays.asList('a','b','c',
+				'd','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
+				'v','w','x','y','z'));
+		for(int i = 0; i < string.length(); i++) {
+			char letter = string.charAt(i);
+			Iterator<Character> lookAtAlphabet = alphabet.iterator();
+			while(lookAtAlphabet.hasNext()) {
+				if(letter == lookAtAlphabet.next()) {
+					lookAtAlphabet.remove();
+				}
+			}
+		}
+			if(alphabet.isEmpty()) {
+				return true;
+			}else {
+				return false;
+			}
 	}
 
 	/**
@@ -638,10 +711,21 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		int sum = 0;
+		for(int j = i-1; j >= 1; j--) {
+			for(int k = 0; k < set.length; k++) {
+				int checker = 0;
+				if(j % set[k] == 0) {
+				sum += j;
+				checker++;
+				}
+				if(checker == 1) {
+					break;
+				}
+			}
+		}
+		return sum;
 	}
-
 	/**
 	 * 19. Given a number determine whether or not it is valid per the Luhn formula.
 	 * 
@@ -711,8 +795,52 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		String[] words = string.split(" ");
+		int[] numbers = new int[2];
+		String operand = "";
+		int answer = 0;
+		int count = 0;
+		for(int i = 0; i < words.length; i++) {
+	        try 
+	        { 
+	            Integer.parseInt(words[i]); 
+	            if(count == 0) {
+	            	numbers[0] = Integer.parseInt(words[i]);
+	            	count++;
+	            }else {
+	            	numbers[1] = Integer.parseInt(words[i]);
+	            }
+	        }  
+	        catch (NumberFormatException e)  
+	        { 
+	            switch(words[i]) {
+	            case "plus":
+	            	operand = "plus";
+	            	break;
+	            case "minus":
+	            	operand = "minus";
+	            	break;
+	            case "multiplied":
+	            	operand = "multiplied";
+	            	break;
+	            case "divided":
+	            	operand = "divided";
+	            	break;
+	            
+	            }
+	        }
+		}
+		if(operand == "plus") {
+			answer = numbers[0] + numbers[1];
+		}else if(operand == "minus") {
+			answer = numbers[0] - numbers[1];
+		}else if(operand == "multiplied") {
+			answer = numbers[0] * numbers[1];
+		}else {
+			answer = numbers[0] / numbers[1];
+		}
+		
+		return answer;
 	}
 
 }
