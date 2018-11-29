@@ -1,8 +1,11 @@
 package com.revature.eval.java.core;
 
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EvaluationService {
 
@@ -30,8 +33,16 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		String acro = "";
+		for(int i = 0; i<phrase.length(); i++) {
+			if(i == 0 && phrase.charAt(0) != ' ') {
+				acro += phrase.charAt(i);
+			}else if(phrase.charAt(i) == ' ' || phrase.charAt(i) == '-') {
+				acro += phrase.charAt(i+1);
+			}
+		}
+		acro.toUpperCase();
+		return acro;
 	}
 
 	/**
@@ -84,18 +95,27 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
+			if(getSideOne() == getSideTwo() && getSideOne() == getSideThree()) {
+				return true;
+			}else {
 			return false;
+			}
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
+			if(getSideOne() == getSideTwo() || getSideOne() == getSideThree() || getSideTwo() == getSideThree()) {
+				return true;
+			}else {
 			return false;
+			}
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if(getSideOne() == getSideTwo() || getSideOne() == getSideThree() || getSideTwo() == getSideThree()) {
+				return false;
+			}else {
+			return true;
+			}
 		}
 
 	}
@@ -116,8 +136,79 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		int score = 0;
+		for(int i = 0; i < string.length(); i++) {
+			char letter = string.charAt(i);
+			switch(letter) {
+			case 'A':
+			case 'a':
+			case 'E':
+			case 'e':
+			case 'I':
+			case 'i':
+			case 'O':
+			case 'o':
+			case 'U':
+			case 'u':
+			case 'L':
+			case 'l':
+			case 'N':
+			case 'n':
+			case 'R':
+			case 'r':
+			case 'S':
+			case 's':
+			case 'T':
+			case 't':
+				score+=1;
+				break;
+			case 'D':
+			case 'd':
+			case 'G':
+			case 'g':
+				score+=2;
+				break;
+			case 'B':
+			case 'b':
+			case 'C':
+			case 'c':
+			case 'M':
+			case 'm':
+			case 'P':
+			case 'p':
+				score+=3;
+				break;
+			case 'F':
+			case 'f':
+			case 'H':
+			case 'h':
+			case 'V':
+			case 'v':
+			case 'W':
+			case 'w':
+			case 'Y':
+			case 'y':
+				score+=4;
+				break;
+			case 'K':
+			case 'k':
+				score+=5;
+				break;
+			case 'J':
+			case 'j':
+			case 'X':
+			case 'x':
+				score+=8;
+				break;
+			case 'Q':
+			case 'q':
+			case 'Z':
+			case 'z':
+				score+=10;
+				break;
+			}
+		}
+		return score;
 	}
 
 	/**
@@ -166,9 +257,40 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		int count = 0;
+		Map<String, Integer> wordCounter = new ConcurrentHashMap<>();
+		String noPunctuation = string.replaceAll("/n", " ");
+		noPunctuation.replaceAll("[^a-zA-Z]", " ");
+		while(count < noPunctuation.length()) {
+			String placeholder = "";
+			for(int i = count; i<noPunctuation.length();i++) {
+				if(noPunctuation.charAt(i) == ' ') {
+					count++;
+					break;
+				}else {
+					placeholder += noPunctuation.charAt(i);
+					count++;
+				}
+			}
+			if(wordCounter.isEmpty() == false) {
+			if(placeholder != "") {
+				for(String key : wordCounter.keySet()) {
+					if(placeholder.equals(key)) {
+						int value = wordCounter.get(key);
+						value++;
+						wordCounter.put(key, value);
+						break;
+					}else {
+						wordCounter.put(placeholder, 1);
+					}
+				}
+			}
+			}else {
+				wordCounter.put(placeholder, 1);
+			}
 	}
+	return wordCounter;
+}
 
 	/**
 	 * 7. Implement a binary search algorithm.
@@ -246,10 +368,18 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		String placeholder = "";
+		switch(string.charAt(0)) {
+		case 'a':
+		case 'e':
+		case 'i':
+		case 'o':
+		case 'u':
+			placeholder += string;
+			placeholder += "ay";
+		}
+		return placeholder;
 	}
-
 	/**
 	 * 9. An Armstrong number is a number that is the sum of its own digits each
 	 * raised to the power of the number of digits.
@@ -266,8 +396,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		// TODO Write an implementation for this method declaration
+		String numString = Integer.toString(input);
+		int count = numString.length();
+		int sum = 0;
+		for(int i = 0; i < count; i++) {
+			 char placeholder = numString.charAt(i);
+			 int intplaceholder = Character.getNumericValue(placeholder);
+			 sum += Math.pow(intplaceholder, count);
+		}
+		if(sum == input) {
+			return true;
+		}else {
 		return false;
+		}
 	}
 
 	/**
@@ -281,8 +422,25 @@ public class EvaluationService {
 	 * @return
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		List<Long> list = new ArrayList<Long>();
+		if(l == 2) {
+			list.add(l);
+		}
+		for(long i = 2; i < l; i++) {
+			if(l % i == 0) {
+					long checkPrime = i;
+					int checker = 0;
+					for(long j = 2; j < checkPrime; j++) {
+						if(checkPrime % j == 0) {
+							checker = 1;
+						}
+					}
+					if(checker == 0) {
+						list.add(checkPrime);
+					}
+			}
+		}
+		return list;
 	}
 
 	/**
@@ -339,8 +497,24 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		int count = 1;
+		int placeholder = 2;
+			for(int j = 3; j < 2147483647; j++) {
+				int otherPlaceholder = 0;
+				for(int k = 2; k < j; k++) {
+					if(j % k == 0) {
+						otherPlaceholder = 1;
+					}
+				}
+			if(otherPlaceholder == 0) {
+				placeholder = j;
+				count++;
+				if(count == i) {
+					break;
+				}
+			}
+			}
+		return placeholder;
 	}
 
 	/**
@@ -420,7 +594,7 @@ public class EvaluationService {
 	}
 
 	/**
-	 * 16. Determine if a sentence is a pangram. A pangram (Greek: παν γράμμα, pan
+	 * 16. Determine if a sentence is a pangram. A pangram (Greek: Ï€Î±Î½ Î³Ï�Î¬Î¼Î¼Î±, pan
 	 * gramma, "every letter") is a sentence using every letter of the alphabet at
 	 * least once. The best known English pangram is:
 	 * 
