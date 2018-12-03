@@ -1,15 +1,17 @@
 package com.revature.eval.java.core;
 
+
 import java.time.LocalDateTime;
-import java.time.Month;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.TreeMap;
 
 public class EvaluationService {
 
@@ -272,10 +274,24 @@ public class EvaluationService {
 	 */
 	public Map<String, Integer> wordCount(String string) {
 		int count = 0;
-		Map<String, Integer> wordCounter = new ConcurrentHashMap<>();
-		String noPunctuation = string.replaceAll("/n", " ");
-		noPunctuation.replaceAll("[^a-zA-Z]", " ");
-		while(count < noPunctuation.length()) {
+		Map<String, Integer> wordCounter = new TreeMap<>();
+		String noPunctuation = string.replaceAll("/n", "");
+		noPunctuation = noPunctuation.replaceAll("[^a-zA-Z]", " ");
+		String[] words = noPunctuation.split(" ");
+		//System.out.println(words[0]);
+		while(count < words.length) {
+			String word = words[count];
+			if(!wordCounter.containsKey(word)) {
+				wordCounter.put(word, 1);
+			}else {
+				wordCounter.put(word, wordCounter.get(word) + 1);
+			}
+			count++;
+		}
+		wordCounter.remove("");
+		return wordCounter;
+		
+		/*while(count < noPunctuation.length()) {
 			String placeholder = "";
 			for(int i = count; i<noPunctuation.length();i++) {
 				if(noPunctuation.charAt(i) == ' ') {
@@ -302,8 +318,7 @@ public class EvaluationService {
 			}else {
 				wordCounter.put(placeholder, 1);
 			}
-	}
-	return wordCounter;
+	}*/
 }
 
 	/**
@@ -351,22 +366,26 @@ public class EvaluationService {
 			if(t == checkList.get(index1)) {
 				return index1;
 			}
-			while(t != checkList.get(index1)) {
+			while(checkList.size() != 0) {
 				int halfIndex;
+				if(checkList.size() == 0) {
+					return 0;
+				}
 				if(checkList.size() % 2 == 0) {
 					halfIndex = ((checkList.size() / 2));
 				}else {
 					halfIndex = ((checkList.size() / 2) + 1);
+					//System.out.println(halfIndex);
 				}
-				System.out.println(halfIndex);
-				System.out.println(t.compareTo(checkList.get(halfIndex)));
-				if(t == checkList.get(halfIndex)) {
+				//System.out.println(halfIndex);
+				//System.out.println(t.compareTo(checkList.get(halfIndex)));
+				if(t.compareTo(checkList.get(halfIndex)) == 0) {
 					return placeholder.indexOf(checkList.get(halfIndex));
-				}/*else if(t.compareTo(checkList.get(halfIndex)) < 0){
+				}else if(t.compareTo(checkList.get(halfIndex)) < 0){
 					checkList = checkList.subList(0, halfIndex);
 				}else if(t.compareTo(checkList.get(halfIndex)) > 0) {
-					checkList = checkList.subList(halfIndex, checkList.size() - 1);
-				}*/
+					checkList = checkList.subList(halfIndex, checkList.size());
+				}
 			}
 			
 			return 0;
@@ -405,37 +424,35 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {//still need to solve phrase
-		String placeholder = "";
-		switch(string.charAt(0)) {
-		case 'a':
-		case 'e':
-		case 'i':
-		case 'o':
-		case 'u':
-			placeholder += string;
-			placeholder += "ay";
-		default:
-			if(placeholder == "") {
-				String stringBegin = "";
-				for(int i = 0; i < string.length(); i++) {
-					switch(string.charAt(i)) {
-					case 'a':
-					case 'e':
-					case 'i':
-					case 'o':
-					case 'u':
-						for(int j = i; j<string.length(); j++) {
-							placeholder += Character.toString(string.charAt(j));
-						}
-						placeholder += stringBegin + "ay";
-						return placeholder;
-					default:
-						stringBegin += Character.toString(string.charAt(i));
-					}
+		String[] words = string.split(" ");
+		String pigLatin = "";
+		for(int i = 0; i < words.length; i++) {
+			boolean checker = true;
+			while(checker) {
+				switch(words[i].charAt(0)) {
+				case 'a':
+				case 'e':
+				case 'i':
+				case 'o':
+				case 'u':
+					words[i] += "ay";
+					checker = false;
+					break;
+				case 'q':
+					String qu = "qu";
+					words[i] = words[i].substring(2) + qu;
+					words[i] += "ay";
+					checker = false;
+					break;
+				default:
+					char letter = words[i].charAt(0);
+					words[i] = words[i].substring(1) + letter;
 				}
 			}
+			pigLatin += words[i] + " ";
 		}
-		return placeholder;
+		pigLatin = pigLatin.trim();
+		return pigLatin;
 	}
 	/**
 	 * 9. An Armstrong number is a number that is the sum of its own digits each
@@ -487,22 +504,12 @@ public class EvaluationService {
 		for(long i = 2; i <= l; i++) {
 			if(l % i == 0) {
 					l = l/i;
-					System.out.println(l);
+					//System.out.println(l);
 					list.add(i);
 					i=1;
-					/*long checkPrime = i;
-					int checker = 0;
-					for(long j = 2; j < checkPrime; j++) {
-						if(checkPrime % j == 0) {
-							checker = 1;
-						}
-					}
-					if(checker == 0) {
-						list.add(checkPrime);
-					}*/
 			}
 		}
-		System.out.println(list);
+		//System.out.println(list);
 		return list;
 	}
 
@@ -547,8 +554,8 @@ public class EvaluationService {
 			String placeholder1 = alphabet.substring(0, key);
 			String placeholder2 = alphabet.substring(key);
 			ciphered = placeholder2 + placeholder1;
-			System.out.println(alphabet);
-			System.out.println(ciphered);
+			//System.out.println(alphabet);
+			//System.out.println(ciphered);
 			for(int i = 0; i < string.length(); i++) {
 				if(Character.isUpperCase(string.charAt(i))) {
 					char letter = Character.toLowerCase(string.charAt(i));
@@ -765,7 +772,14 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		return null;
+		Temporal placeholder;
+		try {
+		placeholder = LocalDateTime.of(given.get(ChronoField.YEAR), given.get(ChronoField.MONTH_OF_YEAR), given.get(ChronoField.DAY_OF_MONTH), given.get(ChronoField.HOUR_OF_DAY), given.get(ChronoField.MINUTE_OF_HOUR), given.get(ChronoField.SECOND_OF_MINUTE));
+		}catch(UnsupportedTemporalTypeException e) {
+			placeholder = LocalDateTime.of(given.get(ChronoField.YEAR), given.get(ChronoField.MONTH_OF_YEAR), given.get(ChronoField.DAY_OF_MONTH), 0,0,0);
+		}
+		return placeholder.plus(1000000000L, ChronoUnit.SECONDS);
+
 	}
 
 	/**
@@ -859,13 +873,13 @@ public class EvaluationService {
 				if(placeholder > 9) {
 					placeholder -= 9;
 					sum += placeholder;
-					System.out.println(placeholder);
+					//System.out.println(placeholder);
 				}else {
 					sum += placeholder;
 				}
 				}else {
 					sum += Character.getNumericValue(string.charAt(i));
-					System.out.println(sum);
+					//System.out.println(sum);
 				}
 			}
 		}
@@ -944,8 +958,8 @@ public class EvaluationService {
 	            }
 	        }
 		}
-		System.out.println(num1);
-		System.out.println(num2);
+		//System.out.println(num1);
+		//System.out.println(num2);
 		if(operand == "plus") {
 			answer = num1 + num2;
 		}else if(operand == "minus") {
